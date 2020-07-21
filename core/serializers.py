@@ -18,9 +18,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
         fields = ['id', 'user']
 
     def create(self, validated_data):
-        user = UserSerializer(data=validated_data.pop('user'))
-        user.is_valid()
-        user = user.save()
+        user = User.objects.create_user(**validated_data.pop('user'), is_staff=True)
         _profile = UserProfile(**validated_data, user=user)
         _profile.save()
 
