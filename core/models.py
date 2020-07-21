@@ -46,6 +46,8 @@ class Answer(models.Model):
     quiz_answer = models.ForeignKey("QuizAnswer", related_name="answers", on_delete=models.CASCADE)
     answer = models.TextField()
 
+    score = models.IntegerField(default=0)
+
     def __str__(self):
         return str(self.question) + " | " + str(self.answer)
 
