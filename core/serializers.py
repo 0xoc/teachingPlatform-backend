@@ -1,3 +1,5 @@
+from abc import ABC
+
 from django.contrib.auth.models import User
 from rest_framework import serializers
 
@@ -28,10 +30,31 @@ class UserProfileSerializer(serializers.ModelSerializer):
         return _profile
 
 
+class TeacherUsernameRelatedField(serializers.RelatedField):
+
+    def to_internal_value(self, data):
+        try:
+            return UserProfile.objects.get(user__username=data)
+        except UserProfile.DoesNotExist:
+            raise serializers.ValidationError(_("No users with the give username exist"))
+
+    def to_representation(self, value):
+        return str(value)
+
+
 class ClassRoomSerializer(serializers.ModelSerializer):
+    teacher_username = TeacherUsernameRelatedField(
+        source="teacher",
+        queryset=UserProfile.objects.all()
+    )
+
     class Meta:
         model = ClassRoom
-        fields = ['id', 'class_name', 'teacher']
+        fields = ['id', 'class_name', 'teacher', 'teacher_username']
+        extra_kwargs = {
+            'teacher': {'read_only': True},
+            'teacher_username': {'write_only': True}
+        }
 
 
 class QuizSerializer(serializers.ModelSerializer):
