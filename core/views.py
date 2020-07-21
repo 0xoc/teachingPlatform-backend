@@ -1,11 +1,12 @@
-from rest_framework.generics import CreateAPIView, RetrieveAPIView, get_object_or_404, UpdateAPIView
+from rest_framework.generics import CreateAPIView, RetrieveAPIView, get_object_or_404, UpdateAPIView, \
+    RetrieveUpdateAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from core.models import ClassRoom, UserProfile
 from core.permissions import IsTeacherOrSuperuser
-from core.serializers import UserProfileSerializer, ClassRoomCreateSerializer, ClassRoomRetrieveSerializer, \
+from core.serializers import UserProfileSerializer, ClassRoomSerializer, ClassRoomRetrieveSerializer, \
     QuizSerializer
 
 
@@ -21,7 +22,7 @@ class ClassRoomCreateView(CreateAPIView):
     create class room
     """
     permission_classes = [IsAuthenticated, ]
-    serializer_class = ClassRoomCreateSerializer
+    serializer_class = ClassRoomSerializer
 
 
 class QuizCreateView(CreateAPIView):
@@ -92,6 +93,18 @@ class ClassRoomRetrieveView(RetrieveAPIView):
     """
     permission_classes = [IsAuthenticated, ]
     serializer_class = ClassRoomRetrieveSerializer
+    queryset = ClassRoom.objects.all()
+
+    lookup_field = 'pk'
+    lookup_url_kwarg = 'class_id'
+
+
+class ClassRoomUpdateView(RetrieveUpdateAPIView):
+    """
+    Retrieve update class info
+    """
+    permission_classes = [IsAuthenticated, IsTeacherOrSuperuser]
+    serializer_class = ClassRoomSerializer
     queryset = ClassRoom.objects.all()
 
     lookup_field = 'pk'

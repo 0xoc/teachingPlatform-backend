@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import UserProfileCreateView, ClassRoomCreateView, ClassRoomRetrieveView, QuizCreateView, RegisterQuitClass, \
-    AddRemoveStudentClass
+    AddRemoveStudentClass, ClassRoomUpdateView
 
 urlpatterns = [
     path('user/create', UserProfileCreateView.as_view()),
@@ -8,6 +8,7 @@ urlpatterns = [
     # create retrieve class
     path('class/create/', ClassRoomCreateView.as_view()),
     path('class/<int:class_id>/', ClassRoomRetrieveView.as_view()),
+    path('class/<int:class_id>/update', ClassRoomUpdateView.as_view()),
 
     path('class/<int:class_id>/register/', RegisterQuitClass.as_view()),
     path('class/<int:class_id>/register/<int:user_id>/', AddRemoveStudentClass.as_view()),

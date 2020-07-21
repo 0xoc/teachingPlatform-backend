@@ -25,7 +25,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
         return _profile
 
 
-class ClassRoomCreateSerializer(serializers.ModelSerializer):
+class ClassRoomSerializer(serializers.ModelSerializer):
     class Meta:
         model = ClassRoom
         fields = ['id', 'class_name', 'teacher']
