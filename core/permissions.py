@@ -17,7 +17,7 @@ class IsTeacherOrSuperuser(BasePermission):
         if request.user.is_superuser:
             return True
 
-        return the_class.teacher == request.user
+        return the_class.teacher == request.user.user_profile
 
     def has_permission(self, request, view):
 

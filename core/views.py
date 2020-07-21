@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from rest_framework.generics import CreateAPIView, RetrieveAPIView, UpdateAPIView, \
     RetrieveUpdateAPIView, ListAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.permissions import IsAuthenticated
@@ -8,7 +9,7 @@ from core.models import ClassRoom, UserProfile, Quiz, Question, QuizAnswer, Answ
 from core.permissions import IsTeacherOrSuperuser, CanSeeQuizQuestions, IsEnrolledInClass, IsQuizActive, IsSelfOrCanSee
 from core.serializers import UserProfileSerializer, ClassRoomSerializer, ClassRoomRetrieveSerializer, \
     QuizSerializer, QuestionSerializer, QuizAnswerSerializer, AnswerSerializer, QuizAnswerDetailedSerializer, \
-    ScoreAnswerSerializer, PrivateUserProfileSerializer
+    ScoreAnswerSerializer, PrivateUserProfileSerializer, Authenticate
 from core.utils import get_object
 
 
@@ -17,6 +18,27 @@ class UserProfileCreateView(CreateAPIView):
     create user profile
     """
     serializer_class = PrivateUserProfileSerializer
+
+
+class AuthenticateView(CreateAPIView):
+    """
+    Authenticate user
+    """
+    serializer_class = Authenticate
+
+    def create(self, request, *args, **kwargs):
+        try:
+            username = request.data.get('username')
+            user = User.objects.get(username=username)
+
+            if user.check_password(request.data.get('password')):
+                up_serializer = PrivateUserProfileSerializer(instance=user.user_profile)
+                return Response(up_serializer.data)
+
+            raise User.DoesNotExist
+
+        except User.DoesNotExist:
+            return Response({'detail': 'Invalid Credentials'}, status=400)
 
 
 class ClassRoomCreateView(CreateAPIView):
@@ -184,7 +206,7 @@ class ClassRoomRetrieveView(RetrieveAPIView):
     """
     retrieve class room, list of students and quizzes will be returned
     """
-    permission_classes = [IsAuthenticated, ]
+    permission_classes = [IsAuthenticated, IsEnrolledInClass | IsTeacherOrSuperuser]
     serializer_class = ClassRoomRetrieveSerializer
     queryset = ClassRoom.objects.all()
 
@@ -201,11 +223,11 @@ class ClassList(ListAPIView):
     queryset = ClassRoom.objects.all()
 
 
-class ClassRoomUpdateView(RetrieveUpdateAPIView):
+class ClassRoomUpdateView(RetrieveUpdateDestroyAPIView):
     """
     Retrieve update class info
     """
-    permission_classes = [IsAuthenticated, IsEnrolledInClass | IsTeacherOrSuperuser]
+    permission_classes = [IsAuthenticated, IsTeacherOrSuperuser]
     serializer_class = ClassRoomSerializer
     queryset = ClassRoom.objects.all()
 

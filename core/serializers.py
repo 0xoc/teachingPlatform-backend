@@ -13,11 +13,16 @@ from core.permissions import IsTeacherOrSuperuser
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['username', 'password', 'first_name', 'last_name']
+        fields = ['username', 'password', 'first_name', 'last_name', 'is_superuser']
 
         extra_kwargs = {
             'password': {'write_only': True}
         }
+
+
+class Authenticate(serializers.Serializer):
+    username = serializers.CharField(required=True)
+    password = serializers.CharField(required=True)
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
@@ -25,7 +30,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserProfile
-        fields = ['id', 'user',]
+        fields = ['id', 'user', ]
 
     def create(self, validated_data):
         user = User.objects.create_user(**validated_data.pop('user'), is_staff=True)
