@@ -220,7 +220,7 @@ class ClassList(ListAPIView):
     """
     permission_classes = [IsAuthenticated, ]
     serializer_class = ClassRoomSerializer
-    queryset = ClassRoom.objects.all()
+    queryset = ClassRoom.objects.all().order_by('-id')
 
 
 class ClassRoomUpdateView(RetrieveUpdateDestroyAPIView):
