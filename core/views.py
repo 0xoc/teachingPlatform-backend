@@ -1,7 +1,9 @@
-from rest_framework.generics import CreateAPIView, RetrieveAPIView, get_object_or_404
+from rest_framework.generics import CreateAPIView, RetrieveAPIView, get_object_or_404, UpdateAPIView
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
-from core.models import ClassRoom
+from core.models import ClassRoom, UserProfile
 from core.permissions import IsTeacherOrSuperuser
 from core.serializers import UserProfileSerializer, ClassRoomCreateSerializer, ClassRoomRetrieveSerializer, \
     QuizSerializer
@@ -30,8 +32,38 @@ class QuizCreateView(CreateAPIView):
     serializer_class = QuizSerializer
 
     def perform_create(self, serializer):
-        _class = get_object_or_404(ClassRoom, pk=self.kwargs.get('pk'))
+        _class = get_object_or_404(ClassRoom, pk=self.kwargs.get('class_id'))
         serializer.save(class_room=_class)
+
+
+class RegisterToClass(APIView):
+    """
+    currently logged in user will be registered to the given class
+    """
+    permission_classes = [IsAuthenticated, ]
+
+    def post(self, request, *args, **kwargs):
+        user_profile = request.user.user_profile
+        _class = get_object_or_404(ClassRoom, pk=kwargs.get('class_id'))
+        _class.students.add(user_profile)
+
+        return Response({}, status=200)
+
+
+class AddStudentToClass(APIView):
+    """
+    add a given student to the give class
+    only class teacher and superuser
+    """
+    permission_classes = [IsAuthenticated, IsTeacherOrSuperuser]
+
+    def post(self, request, *args, **kwargs):
+        user_profile = get_object_or_404(UserProfile, pk=kwargs.get('user_id'))
+        class_room = get_object_or_404(ClassRoom, pk=kwargs.get('class_id'))
+
+        class_room.students.add(user_profile)
+
+        return Response({}, status=200)
 
 
 class ClassRoomRetrieveView(RetrieveAPIView):
@@ -41,3 +73,6 @@ class ClassRoomRetrieveView(RetrieveAPIView):
     permission_classes = [IsAuthenticated, ]
     serializer_class = ClassRoomRetrieveSerializer
     queryset = ClassRoom.objects.all()
+
+    lookup_field = 'pk'
+    lookup_url_kwarg = 'class_id'
