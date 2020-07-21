@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
 
-from core.models import UserProfile, ClassRoom
+from core.models import UserProfile, ClassRoom, Quiz, Question, QuizAnswer, Answer
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -10,7 +10,7 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ['username', 'password', 'first_name', 'last_name']
 
 
-class UserProfileCreateSerializer(serializers.ModelSerializer):
+class UserProfileSerializer(serializers.ModelSerializer):
     user = UserSerializer()
 
     class Meta:
@@ -27,8 +27,48 @@ class UserProfileCreateSerializer(serializers.ModelSerializer):
         return _profile
 
 
-class ClassRoomSerializer(serializers.ModelSerializer):
-
+class ClassRoomCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = ClassRoom
         fields = ['id', 'class_name', 'teacher']
+
+
+class QuizSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Quiz
+        fields = ['id', 'quiz_name', 'class_room']
+
+
+class QuestionCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Question
+        fields = ['id', 'quiz', 'text']
+
+
+class QuizAnswerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = QuizAnswer
+        fields = ['id', 'user_profile']
+
+
+class AnswerCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Answer
+        field = ['id', 'question', 'quiz_answer', 'answer']
+
+
+class QuizRetrieveSerializer(serializers.ModelSerializer):
+    answers__quiz_answer = QuizAnswerSerializer(many=True)
+
+    class Meta:
+        model = Quiz
+        fields = ['id', 'questions', 'answers__quiz_answer']
+
+
+class ClassRoomRetrieveSerializer(serializers.ModelSerializer):
+    students = UserProfileSerializer(many=True)
+    quizzes = QuizSerializer(many=True)
+
+    class Meta:
+        model = ClassRoom
+        fields = ['id', 'class_name', 'teacher', 'students', 'quizzes']
