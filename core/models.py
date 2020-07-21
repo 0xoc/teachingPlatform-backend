@@ -67,5 +67,9 @@ class QuizAnswer(models.Model):
     def is_active(self):
         return self.quiz.is_active
 
+    @property
+    def score(self):
+        return sum([answer.score for answer in self.answers.all()])
+
     def __str__(self):
         return str(self.user_profile) + " | " + " quiz"

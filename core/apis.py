@@ -1,7 +1,8 @@
 from django.conf.urls import url
 from django.urls import path
 from .views import UserProfileCreateView, ClassRoomCreateView, ClassRoomRetrieveView, QuizCreateView, RegisterQuitClass, \
-    AddRemoveStudentClass, ClassRoomUpdateView, QuizQuestionsList, AddQuizQuestion, RUDQuestion, StartQuiz, CreateAnswer
+    AddRemoveStudentClass, ClassRoomUpdateView, QuizQuestionsList, AddQuizQuestion, RUDQuestion, StartQuiz, \
+    CreateAnswer, QuizAnswerDetailedView
 
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
@@ -38,6 +39,7 @@ urlpatterns = [
     path('quiz/<int:quiz_id>/questions/', QuizQuestionsList.as_view()),
     path('quiz/<int:quiz_id>/start/', StartQuiz.as_view()),
     path('submit-answer/', CreateAnswer.as_view()),
+    path('quiz-answer/<int:quiz_answer_id>/', QuizAnswerDetailedView.as_view()),
 
     url(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
     url(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),

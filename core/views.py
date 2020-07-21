@@ -4,10 +4,10 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from core.models import ClassRoom, UserProfile, Quiz, Question
-from core.permissions import IsTeacherOrSuperuser, CanSeeQuizQuestions, IsEnrolledInClass, IsQuizActive
+from core.models import ClassRoom, UserProfile, Quiz, Question, QuizAnswer
+from core.permissions import IsTeacherOrSuperuser, CanSeeQuizQuestions, IsEnrolledInClass, IsQuizActive, IsSelfOrCanSee
 from core.serializers import UserProfileSerializer, ClassRoomSerializer, ClassRoomRetrieveSerializer, \
-    QuizSerializer, QuestionSerializer, QuizAnswerSerializer, AnswerCreateSerializer
+    QuizSerializer, QuestionSerializer, QuizAnswerSerializer, AnswerSerializer, QuizAnswerDetailedSerializer
 from core.utils import get_object
 
 
@@ -36,6 +36,18 @@ class QuizCreateView(CreateAPIView):
     def perform_create(self, serializer):
         _class = get_object(ClassRoom, pk=self.kwargs.get('class_id'))
         serializer.save(class_room=_class)
+
+
+class QuizAnswerDetailedView(RetrieveAPIView):
+    """
+    Detailed Quiz Answer views of  a specific session
+    """
+    permission_classes = [IsAuthenticated, IsSelfOrCanSee]
+    serializer_class = QuizAnswerDetailedSerializer
+    queryset = QuizAnswer.objects.all()
+
+    lookup_url_kwarg = 'quiz_answer_id'
+    lookup_field = 'pk'
 
 
 class AddQuizQuestion(CreateAPIView):
@@ -100,7 +112,7 @@ class CreateAnswer(CreateAPIView):
     """
 
     permission_classes = [IsAuthenticated, ]
-    serializer_class = AnswerCreateSerializer
+    serializer_class = AnswerSerializer
 
 
 class RegisterQuitClass(APIView):

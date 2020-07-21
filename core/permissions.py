@@ -3,7 +3,7 @@ from rest_framework.exceptions import APIException
 from rest_framework.permissions import BasePermission, SAFE_METHODS
 from django.utils.translation import gettext as _
 
-from core.models import ClassRoom, Quiz, Question
+from core.models import ClassRoom, Quiz, Question, QuizAnswer
 from core.utils import get_object
 
 
@@ -39,6 +39,21 @@ class IsTeacherOrSuperuser(BasePermission):
             class_id = view.kwargs.get('class_id')
 
         return self.is_teacher_or_superuser(class_id, request)
+
+
+class IsSelfOrCanSee(BasePermission):
+    message = _("You can not see details")
+
+    def has_permission(self, request, view):
+        quiz_answer = get_object(QuizAnswer, pk=view.kwargs.get('quiz_answer_id'))
+        user_profile = request.user.user_profile
+
+        class_id = quiz_answer.quiz.class_room.id
+
+        if IsTeacherOrSuperuser.is_teacher_or_superuser(class_id, request):
+            return True
+
+        return quiz_answer.user_profile == user_profile
 
 
 class IsEnrolledInClass(BasePermission):

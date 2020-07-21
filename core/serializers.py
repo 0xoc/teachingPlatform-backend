@@ -50,31 +50,13 @@ class QuestionSerializer(serializers.ModelSerializer):
         }
 
 
-class QuizAnswerSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = QuizAnswer
-        fields = ['id', 'user_profile', 'quiz']
-        extra_kwargs = {
-            'user_profile': {'read_only': True},
-            'quiz': {'read_only': True}
-        }
-
-    def create(self, validated_data):
-        user_profile = self.context['request'].user.user_profile
-        try:
-            return QuizAnswer.objects.get(user_profile=user_profile,
-                                          quiz=validated_data.get('quiz'))
-        except QuizAnswer.DoesNotExist:
-            question_answer = QuizAnswer(**validated_data, user_profile=user_profile)
-            question_answer.save()
-
-            return question_answer
-
-
-class AnswerCreateSerializer(serializers.ModelSerializer):
+class AnswerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Answer
-        fields = ['id', 'question', 'quiz_answer', 'answer']
+        fields = ['id', 'question', 'quiz_answer', 'answer', 'score']
+        extra_kwargs = {
+            'score': {'read_only': True}
+        }
 
     def validate(self, attrs):
         question = attrs.get('question')
@@ -105,6 +87,37 @@ class AnswerCreateSerializer(serializers.ModelSerializer):
             new = Answer(**validated_data)
             new.save()
             return new
+
+
+class QuizAnswerDetailedSerializer(serializers.ModelSerializer):
+    answers = AnswerSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = QuizAnswer
+        fields = ['id', 'quiz', 'user_profile', 'score', 'answers']
+
+
+class QuizAnswerSerializer(serializers.ModelSerializer):
+    user_profile = UserProfileSerializer(read_only=True)
+
+    class Meta:
+        model = QuizAnswer
+        fields = ['id', 'user_profile', 'quiz', 'score']
+        extra_kwargs = {
+            'user_profile': {'read_only': True},
+            'quiz': {'read_only': True}
+        }
+
+    def create(self, validated_data):
+        user_profile = self.context['request'].user.user_profile
+        try:
+            return QuizAnswer.objects.get(user_profile=user_profile,
+                                          quiz=validated_data.get('quiz'))
+        except QuizAnswer.DoesNotExist:
+            question_answer = QuizAnswer(**validated_data, user_profile=user_profile)
+            question_answer.save()
+
+            return question_answer
 
 
 class QuizRetrieveSerializer(serializers.ModelSerializer):
