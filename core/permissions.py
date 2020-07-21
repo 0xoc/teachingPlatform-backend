@@ -10,7 +10,7 @@ class IsTeacherOrSuperuser(BasePermission):
     def has_permission(self, request, view):
 
         from core.views import QuizCreateView
-        from core.views import AddStudentToClass
+        from core.views import AddRemoveStudentClass
 
         if request.method in SAFE_METHODS:
             return True

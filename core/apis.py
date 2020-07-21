@@ -1,6 +1,6 @@
 from django.urls import path
-from .views import UserProfileCreateView, ClassRoomCreateView, ClassRoomRetrieveView, QuizCreateView, RegisterToClass, \
-    AddStudentToClass
+from .views import UserProfileCreateView, ClassRoomCreateView, ClassRoomRetrieveView, QuizCreateView, RegisterQuitClass, \
+    AddRemoveStudentClass
 
 urlpatterns = [
     path('user/create', UserProfileCreateView.as_view()),
@@ -9,8 +9,8 @@ urlpatterns = [
     path('class/create/', ClassRoomCreateView.as_view()),
     path('class/<int:class_id>/', ClassRoomRetrieveView.as_view()),
 
-    path('class/<int:class_id>/register/', RegisterToClass.as_view()),
-    path('class/<int:class_id>/register/<int:user_id>/', AddStudentToClass.as_view()),
+    path('class/<int:class_id>/register/', RegisterQuitClass.as_view()),
+    path('class/<int:class_id>/register/<int:user_id>/', AddRemoveStudentClass.as_view()),
 
     path('class/<int:class_id>/quiz/create/', QuizCreateView.as_view()),
 ]

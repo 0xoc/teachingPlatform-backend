@@ -36,9 +36,10 @@ class QuizCreateView(CreateAPIView):
         serializer.save(class_room=_class)
 
 
-class RegisterToClass(APIView):
+class RegisterQuitClass(APIView):
     """
-    currently logged in user will be registered to the given class
+    currently logged in user will be registered to the given class if method is post
+    and will be removed from class if method is delete
     """
     permission_classes = [IsAuthenticated, ]
 
@@ -49,10 +50,17 @@ class RegisterToClass(APIView):
 
         return Response({}, status=200)
 
+    def delete(self, request, *args, **kwargs):
+        user_profile = request.user.user_profile
+        _class = get_object_or_404(ClassRoom, pk=kwargs.get('class_id'))
+        _class.students.remove(user_profile)
 
-class AddStudentToClass(APIView):
+        return Response({}, status=204)
+
+
+class AddRemoveStudentClass(APIView):
     """
-    add a given student to the give class
+    add/remove a given student to the give class
     only class teacher and superuser
     """
     permission_classes = [IsAuthenticated, IsTeacherOrSuperuser]
@@ -64,6 +72,14 @@ class AddStudentToClass(APIView):
         class_room.students.add(user_profile)
 
         return Response({}, status=200)
+
+    def delete(self, request, *args, **kwargs):
+        user_profile = get_object_or_404(UserProfile, pk=kwargs.get('user_id'))
+        class_room = get_object_or_404(ClassRoom, pk=kwargs.get('class_id'))
+
+        class_room.students.remove(user_profile)
+
+        return Response({}, status=204)
 
 
 class ClassRoomRetrieveView(RetrieveAPIView):
