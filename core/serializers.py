@@ -52,7 +52,22 @@ class QuestionSerializer(serializers.ModelSerializer):
 class QuizAnswerSerializer(serializers.ModelSerializer):
     class Meta:
         model = QuizAnswer
-        fields = ['id', 'user_profile']
+        fields = ['id', 'user_profile', 'quiz']
+        extra_kwargs = {
+            'user_profile': {'read_only': True},
+            'quiz': {'read_only': True}
+        }
+
+    def create(self, validated_data):
+        user_profile = self.context['request'].user.user_profile
+        try:
+            return QuizAnswer.objects.get(user_profile=user_profile,
+                                          quiz=validated_data.get('quiz'))
+        except QuizAnswer.DoesNotExist:
+            question_answer = QuizAnswer(**validated_data, user_profile=user_profile)
+            question_answer.save()
+
+            return question_answer
 
 
 class AnswerCreateSerializer(serializers.ModelSerializer):

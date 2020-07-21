@@ -52,6 +52,7 @@ class Answer(models.Model):
 
 class QuizAnswer(models.Model):
     user_profile = models.ForeignKey(UserProfile, related_name="quiz_answers", on_delete=models.CASCADE)
+    quiz = models.ForeignKey(Quiz, related_name="answers", on_delete=models.CASCADE)
     create_date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

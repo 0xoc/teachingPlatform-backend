@@ -5,9 +5,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from core.models import ClassRoom, UserProfile, Quiz, Question
-from core.permissions import IsTeacherOrSuperuser, CanSeeQuizQuestions
+from core.permissions import IsTeacherOrSuperuser, CanSeeQuizQuestions, IsEnrolledInClass, IsQuizActive
 from core.serializers import UserProfileSerializer, ClassRoomSerializer, ClassRoomRetrieveSerializer, \
-    QuizSerializer, QuestionSerializer
+    QuizSerializer, QuestionSerializer, QuizAnswerSerializer
 from core.utils import get_object
 
 
@@ -76,6 +76,18 @@ class QuizQuestionsList(ListAPIView):
     def get_queryset(self):
         quiz = get_object(Quiz, pk=self.kwargs.get('quiz_id'))
         return quiz.questions.all()
+
+
+class StartQuiz(CreateAPIView):
+    """
+    Start quiz answering session
+    """
+    permission_classes = [IsAuthenticated, IsEnrolledInClass, IsQuizActive]
+    serializer_class = QuizAnswerSerializer
+
+    def perform_create(self, serializer):
+        quiz = get_object(Quiz, pk=self.kwargs.get('quiz_id'))
+        serializer.save(quiz=quiz)
 
 
 class RegisterQuitClass(APIView):

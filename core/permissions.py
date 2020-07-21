@@ -52,15 +52,23 @@ class IsEnrolledInClass(BasePermission):
 
     def has_permission(self, request, view):
 
-        from core.views import QuizQuestionsList
+        from core.views import QuizQuestionsList, StartQuiz
 
-        if type(view) == QuizQuestionsList:
+        if type(view) in [QuizQuestionsList, StartQuiz]:
             quiz = get_object(Quiz, pk=view.kwargs.get('quiz_id'))
             class_id = quiz.class_room.id
         else:
             raise APIException("Invalid Permission Usage")
 
         return self.is_enrolled_in_class(class_id, request)
+
+
+class IsQuizActive(BasePermission):
+    message = _('Quiz is not active for answering')
+
+    def has_permission(self, request, view):
+        quiz = get_object(Quiz, pk=view.kwargs.get('quiz_id'))
+        return quiz.is_active
 
 
 class CanSeeQuizQuestions(BasePermission):
