@@ -40,7 +40,7 @@ class QuizSerializer(serializers.ModelSerializer):
         }
 
 
-class QuestionCreateSerializer(serializers.ModelSerializer):
+class QuestionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Question
         fields = ['id', 'quiz', 'text']

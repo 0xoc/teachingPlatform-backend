@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 
 class UserProfile(models.Model):
@@ -21,6 +22,12 @@ class ClassRoom(models.Model):
 class Quiz(models.Model):
     quiz_name = models.CharField(max_length=255)
     class_room = models.ForeignKey(ClassRoom, related_name="quizzes", on_delete=models.CASCADE)
+    start_datetime = models.DateTimeField()
+    end_datetime = models.DateTimeField()
+
+    @property
+    def is_active(self):
+        return self.start_datetime <= timezone.now() <= self.end_datetime
 
     def __str__(self):
         return self.quiz_name

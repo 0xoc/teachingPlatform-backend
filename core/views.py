@@ -1,13 +1,13 @@
 from rest_framework.generics import CreateAPIView, RetrieveAPIView, get_object_or_404, UpdateAPIView, \
-    RetrieveUpdateAPIView
+    RetrieveUpdateAPIView, ListAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from core.models import ClassRoom, UserProfile
-from core.permissions import IsTeacherOrSuperuser
+from core.models import ClassRoom, UserProfile, Quiz
+from core.permissions import IsTeacherOrSuperuser, CanSeeQuizQuestions
 from core.serializers import UserProfileSerializer, ClassRoomSerializer, ClassRoomRetrieveSerializer, \
-    QuizSerializer
+    QuizSerializer, QuestionSerializer
 
 
 class UserProfileCreateView(CreateAPIView):
@@ -35,6 +35,20 @@ class QuizCreateView(CreateAPIView):
     def perform_create(self, serializer):
         _class = get_object_or_404(ClassRoom, pk=self.kwargs.get('class_id'))
         serializer.save(class_room=_class)
+
+
+class QuizQuestionsList(ListAPIView):
+    """
+    get quiz questions
+    teachers and super users can always see questions
+    otherwise only enrolled students after quiz started
+    """
+    permission_classes = [IsAuthenticated, CanSeeQuizQuestions]
+    serializer_class = QuestionSerializer
+
+    def get_queryset(self):
+        quiz = get_object_or_404(Quiz, pk=self.kwargs.get('quiz_id'))
+        return quiz.questions.all()
 
 
 class RegisterQuitClass(APIView):
