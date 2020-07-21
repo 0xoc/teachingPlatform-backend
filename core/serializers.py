@@ -14,6 +14,10 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ['username', 'password', 'first_name', 'last_name']
 
+        extra_kwargs = {
+            'password': {'write_only': True}
+        }
+
 
 class UserProfileSerializer(serializers.ModelSerializer):
     user = UserSerializer()
@@ -42,27 +46,29 @@ class TeacherUsernameRelatedField(serializers.RelatedField):
         return str(value)
 
 
-class ClassRoomSerializer(serializers.ModelSerializer):
-    teacher_username = TeacherUsernameRelatedField(
-        source="teacher",
-        queryset=UserProfile.objects.all()
-    )
-
-    class Meta:
-        model = ClassRoom
-        fields = ['id', 'class_name', 'teacher', 'teacher_username']
-        extra_kwargs = {
-            'teacher': {'read_only': True},
-            'teacher_username': {'write_only': True}
-        }
-
-
 class QuizSerializer(serializers.ModelSerializer):
     class Meta:
         model = Quiz
         fields = ['id', 'quiz_name', 'class_room', 'credit']
         extra_kwargs = {
             'class_room': {'read_only': True}
+        }
+
+
+class ClassRoomSerializer(serializers.ModelSerializer):
+    teacher_username = TeacherUsernameRelatedField(
+        source="teacher",
+        queryset=UserProfile.objects.all()
+    )
+
+    teacher = UserProfileSerializer(read_only=True)
+
+    class Meta:
+        model = ClassRoom
+        fields = ['id', 'class_name', 'teacher', 'teacher_username', 'students_count']
+        extra_kwargs = {
+            'teacher': {'read_only': True},
+            'teacher_username': {'write_only': True}
         }
 
 
@@ -174,7 +180,8 @@ class QuizRetrieveSerializer(serializers.ModelSerializer):
 class ClassRoomRetrieveSerializer(serializers.ModelSerializer):
     students = UserProfileSerializer(many=True)
     quizzes = QuizSerializer(many=True)
+    teacher = UserProfileSerializer(read_only=True)
 
     class Meta:
         model = ClassRoom
-        fields = ['id', 'class_name', 'teacher', 'students', 'quizzes']
+        fields = ['id', 'class_name', 'teacher', 'students', 'quizzes', 'students_count']

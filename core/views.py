@@ -192,11 +192,20 @@ class ClassRoomRetrieveView(RetrieveAPIView):
     lookup_url_kwarg = 'class_id'
 
 
+class ClassList(ListAPIView):
+    """
+        List of all classes with basic info
+    """
+    permission_classes = [IsAuthenticated, ]
+    serializer_class = ClassRoomSerializer
+    queryset = ClassRoom.objects.all()
+
+
 class ClassRoomUpdateView(RetrieveUpdateAPIView):
     """
     Retrieve update class info
     """
-    permission_classes = [IsAuthenticated, IsTeacherOrSuperuser]
+    permission_classes = [IsAuthenticated, IsEnrolledInClass | IsTeacherOrSuperuser]
     serializer_class = ClassRoomSerializer
     queryset = ClassRoom.objects.all()
 

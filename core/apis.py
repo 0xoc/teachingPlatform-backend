@@ -2,7 +2,7 @@ from django.conf.urls import url
 from django.urls import path
 from .views import UserProfileCreateView, ClassRoomCreateView, ClassRoomRetrieveView, QuizCreateView, RegisterQuitClass, \
     AddRemoveStudentClass, ClassRoomUpdateView, QuizQuestionsList, AddQuizQuestion, RUDQuestion, StartQuiz, \
-    CreateAnswer, QuizAnswerDetailedView, SetScoreView
+    CreateAnswer, QuizAnswerDetailedView, SetScoreView, ClassList
 
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
@@ -26,6 +26,7 @@ urlpatterns = [
     # create retrieve class
     path('class/create/', ClassRoomCreateView.as_view()),
     path('class/<int:class_id>/', ClassRoomRetrieveView.as_view()),
+    path('class/list/', ClassList.as_view()),
     path('class/<int:class_id>/update', ClassRoomUpdateView.as_view()),
 
     path('class/<int:class_id>/register/', RegisterQuitClass.as_view()),

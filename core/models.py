@@ -15,6 +15,10 @@ class ClassRoom(models.Model):
     teacher = models.ForeignKey(UserProfile, related_name='teaching', on_delete=models.CASCADE)
     students = models.ManyToManyField(UserProfile, related_name="classes")
 
+    @property
+    def students_count(self):
+        return len(self.students.all())
+
     def __str__(self):
         return self.class_name
 
