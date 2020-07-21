@@ -4,10 +4,11 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from core.models import ClassRoom, UserProfile, Quiz, Question, QuizAnswer
+from core.models import ClassRoom, UserProfile, Quiz, Question, QuizAnswer, Answer
 from core.permissions import IsTeacherOrSuperuser, CanSeeQuizQuestions, IsEnrolledInClass, IsQuizActive, IsSelfOrCanSee
 from core.serializers import UserProfileSerializer, ClassRoomSerializer, ClassRoomRetrieveSerializer, \
-    QuizSerializer, QuestionSerializer, QuizAnswerSerializer, AnswerSerializer, QuizAnswerDetailedSerializer
+    QuizSerializer, QuestionSerializer, QuizAnswerSerializer, AnswerSerializer, QuizAnswerDetailedSerializer, \
+    ScoreAnswerSerializer
 from core.utils import get_object
 
 
@@ -48,6 +49,20 @@ class QuizAnswerDetailedView(RetrieveAPIView):
 
     lookup_url_kwarg = 'quiz_answer_id'
     lookup_field = 'pk'
+
+
+class SetScoreView(RetrieveUpdateAPIView):
+    """
+    set score for an answer
+
+    **permissions are handle in serializer**
+    """
+    permission_classes = [IsAuthenticated, ]
+    serializer_class = ScoreAnswerSerializer
+    queryset = Answer.objects.all()
+
+    lookup_field = 'pk'
+    lookup_url_kwarg = 'answer_id'
 
 
 class AddQuizQuestion(CreateAPIView):

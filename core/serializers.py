@@ -4,6 +4,8 @@ from rest_framework import serializers
 from core.models import UserProfile, ClassRoom, Quiz, Question, QuizAnswer, Answer
 from django.utils.translation import gettext as _
 
+from core.permissions import IsTeacherOrSuperuser
+
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -87,6 +89,24 @@ class AnswerSerializer(serializers.ModelSerializer):
             new = Answer(**validated_data)
             new.save()
             return new
+
+
+class ScoreAnswerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Answer
+        fields = ['id', 'score']
+
+    def validate_score(self, score):
+        if score > self.instance.question.credit:
+            raise serializers.ValidationError(_("Score can't be grater than question credit"))
+        return score
+
+    def validate(self, attrs):
+        if not IsTeacherOrSuperuser.is_teacher_or_superuser(self.instance.question.quiz.class_room.id,
+                                                            self.context['request']):
+            raise serializers.ValidationError(_("You don't have permission to set score"))
+
+        return attrs
 
 
 class QuizAnswerDetailedSerializer(serializers.ModelSerializer):
