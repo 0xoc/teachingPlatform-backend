@@ -38,7 +38,7 @@ class Question(models.Model):
     text = models.CharField(max_length=255)
 
     def __str__(self):
-        return str(self.quiz) + " " + str(self.text)
+        return str(self.quiz) + " | " + str(self.text)
 
 
 class Answer(models.Model):
@@ -47,7 +47,7 @@ class Answer(models.Model):
     answer = models.TextField()
 
     def __str__(self):
-        return str(self.question) + " " + str(self.answer)
+        return str(self.question) + " | " + str(self.answer)
 
 
 class QuizAnswer(models.Model):
@@ -55,4 +55,4 @@ class QuizAnswer(models.Model):
     create_date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return str(self.user_profile) + " " + " quiz"
+        return str(self.user_profile) + " | " + " quiz"

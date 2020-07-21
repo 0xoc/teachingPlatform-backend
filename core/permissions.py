@@ -61,4 +61,4 @@ class CanSeeQuizQuestions(BasePermission):
         if not IsEnrolledInClass.is_enrolled_in_class(quiz.class_room.id, request):
             return False
 
-        return quiz.start_datetime > timezone.now()
+        return timezone.now() > quiz.start_datetime
