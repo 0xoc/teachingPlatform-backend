@@ -35,7 +35,7 @@ class ClassRoomSerializer(serializers.ModelSerializer):
 class QuizSerializer(serializers.ModelSerializer):
     class Meta:
         model = Quiz
-        fields = ['id', 'quiz_name', 'class_room']
+        fields = ['id', 'quiz_name', 'class_room', 'credit']
         extra_kwargs = {
             'class_room': {'read_only': True}
         }
@@ -44,7 +44,7 @@ class QuizSerializer(serializers.ModelSerializer):
 class QuestionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Question
-        fields = ['id', 'quiz', 'text']
+        fields = ['id', 'quiz', 'text', 'credit']
         extra_kwargs = {
             'quiz': {'read_only': True}
         }

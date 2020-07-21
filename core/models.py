@@ -29,6 +29,10 @@ class Quiz(models.Model):
     def is_active(self):
         return self.start_datetime <= timezone.now() <= self.end_datetime
 
+    @property
+    def credit(self):
+        return sum([question.credit for question in self.questions.all()])
+
     def __str__(self):
         return self.quiz_name
 
@@ -36,6 +40,8 @@ class Quiz(models.Model):
 class Question(models.Model):
     quiz = models.ForeignKey(Quiz, related_name="questions", on_delete=models.CASCADE)
     text = models.CharField(max_length=255)
+
+    credit = models.IntegerField(default=0)
 
     def __str__(self):
         return str(self.quiz) + " | " + str(self.text)
