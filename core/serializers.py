@@ -44,6 +44,9 @@ class QuestionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Question
         fields = ['id', 'quiz', 'text']
+        extra_kwargs = {
+            'quiz': {'read_only': True}
+        }
 
 
 class QuizAnswerSerializer(serializers.ModelSerializer):

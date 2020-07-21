@@ -1,13 +1,14 @@
-from rest_framework.generics import CreateAPIView, RetrieveAPIView, get_object_or_404, UpdateAPIView, \
-    RetrieveUpdateAPIView, ListAPIView
+from rest_framework.generics import CreateAPIView, RetrieveAPIView, UpdateAPIView, \
+    RetrieveUpdateAPIView, ListAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from core.models import ClassRoom, UserProfile, Quiz
+from core.models import ClassRoom, UserProfile, Quiz, Question
 from core.permissions import IsTeacherOrSuperuser, CanSeeQuizQuestions
 from core.serializers import UserProfileSerializer, ClassRoomSerializer, ClassRoomRetrieveSerializer, \
     QuizSerializer, QuestionSerializer
+from core.utils import get_object
 
 
 class UserProfileCreateView(CreateAPIView):
@@ -33,8 +34,34 @@ class QuizCreateView(CreateAPIView):
     serializer_class = QuizSerializer
 
     def perform_create(self, serializer):
-        _class = get_object_or_404(ClassRoom, pk=self.kwargs.get('class_id'))
+        _class = get_object(ClassRoom, pk=self.kwargs.get('class_id'))
         serializer.save(class_room=_class)
+
+
+class AddQuizQuestion(CreateAPIView):
+    """
+    Add question to quiz, only class teacher and superusers
+    """
+    permission_classes = [IsAuthenticated, IsTeacherOrSuperuser]
+
+    serializer_class = QuestionSerializer
+
+    def perform_create(self, serializer):
+        quiz = get_object(Quiz, pk=self.kwargs.get('quiz_id'))
+        serializer.save(quiz=quiz)
+
+
+class RUDQuestion(RetrieveUpdateDestroyAPIView):
+    """
+    Retrieve update delete quiz question
+    """
+
+    permission_classes = [IsAuthenticated, IsTeacherOrSuperuser]
+    serializer_class = QuestionSerializer
+    queryset = Question.objects.all()
+
+    lookup_field = 'pk'
+    lookup_url_kwarg = 'question_id'
 
 
 class QuizQuestionsList(ListAPIView):
@@ -47,7 +74,7 @@ class QuizQuestionsList(ListAPIView):
     serializer_class = QuestionSerializer
 
     def get_queryset(self):
-        quiz = get_object_or_404(Quiz, pk=self.kwargs.get('quiz_id'))
+        quiz = get_object(Quiz, pk=self.kwargs.get('quiz_id'))
         return quiz.questions.all()
 
 
@@ -61,7 +88,7 @@ class RegisterQuitClass(APIView):
     @staticmethod
     def post(request, *args, **kwargs):
         user_profile = request.user.user_profile
-        _class = get_object_or_404(ClassRoom, pk=kwargs.get('class_id'))
+        _class = get_object(ClassRoom, pk=kwargs.get('class_id'))
         _class.students.add(user_profile)
 
         return Response({}, status=200)
@@ -69,7 +96,7 @@ class RegisterQuitClass(APIView):
     @staticmethod
     def delete(request, *args, **kwargs):
         user_profile = request.user.user_profile
-        _class = get_object_or_404(ClassRoom, pk=kwargs.get('class_id'))
+        _class = get_object(ClassRoom, pk=kwargs.get('class_id'))
         _class.students.remove(user_profile)
 
         return Response({}, status=204)
@@ -84,8 +111,8 @@ class AddRemoveStudentClass(APIView):
 
     @staticmethod
     def post(request, *args, **kwargs):
-        user_profile = get_object_or_404(UserProfile, pk=kwargs.get('user_id'))
-        class_room = get_object_or_404(ClassRoom, pk=kwargs.get('class_id'))
+        user_profile = get_object(UserProfile, pk=kwargs.get('user_id'))
+        class_room = get_object(ClassRoom, pk=kwargs.get('class_id'))
 
         class_room.students.add(user_profile)
 
@@ -93,8 +120,8 @@ class AddRemoveStudentClass(APIView):
 
     @staticmethod
     def delete(request, *args, **kwargs):
-        user_profile = get_object_or_404(UserProfile, pk=kwargs.get('user_id'))
-        class_room = get_object_or_404(ClassRoom, pk=kwargs.get('class_id'))
+        user_profile = get_object(UserProfile, pk=kwargs.get('user_id'))
+        class_room = get_object(ClassRoom, pk=kwargs.get('class_id'))
 
         class_room.students.remove(user_profile)
 
