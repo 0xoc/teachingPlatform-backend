@@ -43,14 +43,16 @@ class RegisterQuitClass(APIView):
     """
     permission_classes = [IsAuthenticated, ]
 
-    def post(self, request, *args, **kwargs):
+    @staticmethod
+    def post(request, *args, **kwargs):
         user_profile = request.user.user_profile
         _class = get_object_or_404(ClassRoom, pk=kwargs.get('class_id'))
         _class.students.add(user_profile)
 
         return Response({}, status=200)
 
-    def delete(self, request, *args, **kwargs):
+    @staticmethod
+    def delete(request, *args, **kwargs):
         user_profile = request.user.user_profile
         _class = get_object_or_404(ClassRoom, pk=kwargs.get('class_id'))
         _class.students.remove(user_profile)
@@ -65,7 +67,8 @@ class AddRemoveStudentClass(APIView):
     """
     permission_classes = [IsAuthenticated, IsTeacherOrSuperuser]
 
-    def post(self, request, *args, **kwargs):
+    @staticmethod
+    def post(request, *args, **kwargs):
         user_profile = get_object_or_404(UserProfile, pk=kwargs.get('user_id'))
         class_room = get_object_or_404(ClassRoom, pk=kwargs.get('class_id'))
 
@@ -73,7 +76,8 @@ class AddRemoveStudentClass(APIView):
 
         return Response({}, status=200)
 
-    def delete(self, request, *args, **kwargs):
+    @staticmethod
+    def delete(request, *args, **kwargs):
         user_profile = get_object_or_404(UserProfile, pk=kwargs.get('user_id'))
         class_room = get_object_or_404(ClassRoom, pk=kwargs.get('class_id'))
 
