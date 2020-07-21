@@ -2,6 +2,7 @@ from django.contrib.auth.models import User
 from rest_framework import serializers
 
 from core.models import UserProfile, ClassRoom, Quiz, Question, QuizAnswer, Answer
+from django.utils.translation import gettext as _
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -73,7 +74,37 @@ class QuizAnswerSerializer(serializers.ModelSerializer):
 class AnswerCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Answer
-        field = ['id', 'question', 'quiz_answer', 'answer']
+        fields = ['id', 'question', 'quiz_answer', 'answer']
+
+    def validate(self, attrs):
+        question = attrs.get('question')
+        quiz_answer = attrs.get('quiz_answer')
+
+        if not quiz_answer.is_active:
+            raise serializers.ValidationError(_("Quiz is not active for answering"))
+
+        if question.quiz != quiz_answer.quiz:
+            raise serializers.ValidationError(_("Question does not belong to the give session id"))
+
+        if quiz_answer.user_profile != self.context['request'].user.user_profile:
+            raise serializers.ValidationError(_("Current user is not the same as session user"))
+
+        return attrs
+
+    def create(self, validated_data):
+
+        try:
+            old = Answer.objects.get(question=validated_data.get('question'),
+                                     quiz_answer=validated_data.get('quiz_answer'))
+
+            old.answer = validated_data.get('answer')
+            old.save()
+
+            return old
+        except Answer.DoesNotExist:
+            new = Answer(**validated_data)
+            new.save()
+            return new
 
 
 class QuizRetrieveSerializer(serializers.ModelSerializer):

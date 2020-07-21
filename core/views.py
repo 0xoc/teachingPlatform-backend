@@ -7,7 +7,7 @@ from rest_framework.views import APIView
 from core.models import ClassRoom, UserProfile, Quiz, Question
 from core.permissions import IsTeacherOrSuperuser, CanSeeQuizQuestions, IsEnrolledInClass, IsQuizActive
 from core.serializers import UserProfileSerializer, ClassRoomSerializer, ClassRoomRetrieveSerializer, \
-    QuizSerializer, QuestionSerializer, QuizAnswerSerializer
+    QuizSerializer, QuestionSerializer, QuizAnswerSerializer, AnswerCreateSerializer
 from core.utils import get_object
 
 
@@ -88,6 +88,19 @@ class StartQuiz(CreateAPIView):
     def perform_create(self, serializer):
         quiz = get_object(Quiz, pk=self.kwargs.get('quiz_id'))
         serializer.save(quiz=quiz)
+
+
+class CreateAnswer(CreateAPIView):
+    """
+    submit an answer for a question,
+
+    submitting answer to the same question will automatically override the old answer
+
+    **validations will happen in the serializer**
+    """
+
+    permission_classes = [IsAuthenticated, ]
+    serializer_class = AnswerCreateSerializer
 
 
 class RegisterQuitClass(APIView):

@@ -55,5 +55,9 @@ class QuizAnswer(models.Model):
     quiz = models.ForeignKey(Quiz, related_name="answers", on_delete=models.CASCADE)
     create_date = models.DateTimeField(auto_now_add=True)
 
+    @property
+    def is_active(self):
+        return self.quiz.is_active
+
     def __str__(self):
         return str(self.user_profile) + " | " + " quiz"
