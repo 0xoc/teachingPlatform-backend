@@ -11,7 +11,8 @@ class UserProfile(models.Model):
 
 class ClassRoom(models.Model):
     class_name = models.CharField(max_length=255)
-    teacher = models.ForeignKey(UserProfile, related_name='classes', on_delete=models.CASCADE)
+    teacher = models.ForeignKey(UserProfile, related_name='teaching', on_delete=models.CASCADE)
+    students = models.ManyToManyField(UserProfile, related_name="classes")
 
     def __str__(self):
         return self.class_name
