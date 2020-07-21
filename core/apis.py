@@ -7,6 +7,7 @@ from .views import UserProfileCreateView, ClassRoomCreateView, ClassRoomRetrieve
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
+from rest_framework.authtoken import views
 
 schema_view = get_schema_view(
    openapi.Info(
@@ -42,6 +43,8 @@ urlpatterns = [
     path('submit-answer/', CreateAnswer.as_view()),
     path('quiz-answer/<int:quiz_answer_id>/', QuizAnswerDetailedView.as_view()),
     path('answer/<int:answer_id>/set-score/', SetScoreView.as_view()),
+
+    path('api-token-auth/', views.obtain_auth_token),
 
     url(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
     url(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),

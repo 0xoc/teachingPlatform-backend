@@ -8,7 +8,7 @@ from core.models import ClassRoom, UserProfile, Quiz, Question, QuizAnswer, Answ
 from core.permissions import IsTeacherOrSuperuser, CanSeeQuizQuestions, IsEnrolledInClass, IsQuizActive, IsSelfOrCanSee
 from core.serializers import UserProfileSerializer, ClassRoomSerializer, ClassRoomRetrieveSerializer, \
     QuizSerializer, QuestionSerializer, QuizAnswerSerializer, AnswerSerializer, QuizAnswerDetailedSerializer, \
-    ScoreAnswerSerializer
+    ScoreAnswerSerializer, PrivateUserProfileSerializer
 from core.utils import get_object
 
 
@@ -16,7 +16,7 @@ class UserProfileCreateView(CreateAPIView):
     """
     create user profile
     """
-    serializer_class = UserProfileSerializer
+    serializer_class = PrivateUserProfileSerializer
 
 
 class ClassRoomCreateView(CreateAPIView):

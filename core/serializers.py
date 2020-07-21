@@ -2,6 +2,7 @@ from abc import ABC
 
 from django.contrib.auth.models import User
 from rest_framework import serializers
+from rest_framework.authtoken.models import Token
 
 from core.models import UserProfile, ClassRoom, Quiz, Question, QuizAnswer, Answer
 from django.utils.translation import gettext as _
@@ -24,7 +25,29 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserProfile
-        fields = ['id', 'user']
+        fields = ['id', 'user', 'token']
+
+    def create(self, validated_data):
+        user = User.objects.create_user(**validated_data.pop('user'), is_staff=True)
+        _profile = UserProfile(**validated_data, user=user)
+        _profile.save()
+
+        return _profile
+
+
+class PrivateUserProfileSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
+    token = serializers.SerializerMethodField()
+
+    class Meta:
+        model = UserProfile
+        fields = ['id', 'user', 'token', 'token']
+
+    @staticmethod
+    def get_token(instance):
+        token, created = Token.objects.get_or_create(user=instance.user)
+
+        return token.key
 
     def create(self, validated_data):
         user = User.objects.create_user(**validated_data.pop('user'), is_staff=True)
@@ -58,18 +81,16 @@ class QuizSerializer(serializers.ModelSerializer):
 class ClassRoomSerializer(serializers.ModelSerializer):
     teacher_username = TeacherUsernameRelatedField(
         source="teacher",
-        queryset=UserProfile.objects.all()
+        queryset=UserProfile.objects.all(),
+        write_only=True
     )
 
     teacher = UserProfileSerializer(read_only=True)
 
     class Meta:
         model = ClassRoom
-        fields = ['id', 'class_name', 'teacher', 'teacher_username', 'students_count']
-        extra_kwargs = {
-            'teacher': {'read_only': True},
-            'teacher_username': {'write_only': True}
-        }
+        fields = ['id', 'class_name', 'teacher',
+                  'teacher_username', 'students_count']
 
 
 class QuestionSerializer(serializers.ModelSerializer):
