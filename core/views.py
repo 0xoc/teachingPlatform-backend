@@ -26,7 +26,7 @@ class QuizCreateView(CreateAPIView):
     """
     Create quiz for a class, only class teacher and supers users
     """
-    permission_classes = [IsTeacherOrSuperuser, ]
+    permission_classes = [IsAuthenticated, IsTeacherOrSuperuser, ]
     serializer_class = QuizSerializer
 
     def perform_create(self, serializer):
