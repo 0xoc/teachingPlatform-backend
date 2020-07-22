@@ -77,7 +77,8 @@ class TeacherUsernameRelatedField(serializers.RelatedField):
 class QuizSerializer(serializers.ModelSerializer):
     class Meta:
         model = Quiz
-        fields = ['id', 'quiz_name', 'class_room', 'credit']
+        fields = ['id', 'quiz_name', 'class_room', 'credit',
+         'start_datetime', 'end_datetime', 'questions_count', 'is_active']
         extra_kwargs = {
             'class_room': {'read_only': True}
         }

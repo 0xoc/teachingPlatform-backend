@@ -37,6 +37,10 @@ class Quiz(models.Model):
     def credit(self):
         return sum([question.credit for question in self.questions.all()])
 
+    @property
+    def questions_count(self):
+        return len(self.questions.all())
+        
     def __str__(self):
         return self.quiz_name
 
