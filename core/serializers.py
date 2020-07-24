@@ -78,10 +78,15 @@ class QuizSerializer(serializers.ModelSerializer):
     class Meta:
         model = Quiz
         fields = ['id', 'quiz_name', 'class_room', 'credit',
-         'start_datetime', 'end_datetime', 'questions_count', 'is_active']
+                  'start_datetime', 'end_datetime', 'questions_count', 'is_active']
         extra_kwargs = {
             'class_room': {'read_only': True}
         }
+
+    def validate(self, attrs):
+        if attrs.get('end_datetime') < attrs.get('start_datetime'):
+            raise serializers.ValidationError({'end_datetime': ['End date time must be after start date time']})
+        return attrs
 
 
 class ClassRoomSerializer(serializers.ModelSerializer):
@@ -206,9 +211,14 @@ class QuizRetrieveSerializer(serializers.ModelSerializer):
 
 class ClassRoomRetrieveSerializer(serializers.ModelSerializer):
     students = UserProfileSerializer(many=True)
-    quizzes = QuizSerializer(many=True)
+    quizzes = serializers.SerializerMethodField()
     teacher = UserProfileSerializer(read_only=True)
 
     class Meta:
         model = ClassRoom
         fields = ['id', 'class_name', 'teacher', 'students', 'quizzes', 'students_count']
+
+    @staticmethod
+    def get_quizzes(instance):
+        return QuizSerializer(instance=instance.quizzes.all().order_by('-id'),
+                              many=True).data

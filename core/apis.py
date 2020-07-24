@@ -31,7 +31,7 @@ urlpatterns = [
     path('class/<int:class_id>/update/', ClassRoomUpdateView.as_view()),
 
     path('class/<int:class_id>/register/', RegisterQuitClass.as_view()),
-    path('class/<int:class_id>/register/<int:user_id>/', AddRemoveStudentClass.as_view()),
+    path('class/<int:class_id>/register/<user_username>/', AddRemoveStudentClass.as_view()),
 
     path('class/<int:class_id>/quiz/create/', QuizCreateView.as_view()),
 

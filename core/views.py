@@ -157,7 +157,7 @@ class RegisterQuitClass(APIView):
     currently logged in user will be registered to the given class if method is post
     and will be removed from class if method is delete
     """
-    permission_classes = [IsAuthenticated, ]
+    permission_classes = [IsAuthenticated,]
 
     @staticmethod
     def post(request, *args, **kwargs):
@@ -185,18 +185,23 @@ class AddRemoveStudentClass(APIView):
 
     @staticmethod
     def post(request, *args, **kwargs):
-        user_profile = get_object(UserProfile, pk=kwargs.get('user_id'))
+        try:
+            user_profile = UserProfile.objects.get(user__username=kwargs.get('user_username'))
+        except UserProfile.DoesNotExist:
+            return Response({'username': ["User name does not exist", ]}, status=404)
+
         class_room = get_object(ClassRoom, pk=kwargs.get('class_id'))
 
         class_room.students.add(user_profile)
-
         return Response({}, status=200)
 
     @staticmethod
     def delete(request, *args, **kwargs):
-        user_profile = get_object(UserProfile, pk=kwargs.get('user_id'))
+        try:
+            user_profile = UserProfile.objects.get(user__username=kwargs.get('user_username'))
+        except UserProfile.DoesNotExist:
+            return Response({'username': ["User name does not exist", ]}, status=404)
         class_room = get_object(ClassRoom, pk=kwargs.get('class_id'))
-
         class_room.students.remove(user_profile)
 
         return Response({}, status=204)
