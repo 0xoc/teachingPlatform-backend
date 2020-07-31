@@ -180,13 +180,14 @@ class QuizAnswerDetailedSerializer(serializers.ModelSerializer):
 
 class QuizAnswerSerializer(serializers.ModelSerializer):
     user_profile = UserProfileSerializer(read_only=True)
+    quiz = QuizSerializer(read_only=True)
+    answers = AnswerSerializer(many=True, read_only=True)
 
     class Meta:
         model = QuizAnswer
-        fields = ['id', 'user_profile', 'quiz', 'score']
+        fields = ['id', 'user_profile', 'quiz', 'score', 'answers']
         extra_kwargs = {
             'user_profile': {'read_only': True},
-            'quiz': {'read_only': True}
         }
 
     def create(self, validated_data):

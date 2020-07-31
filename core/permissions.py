@@ -24,10 +24,10 @@ class IsTeacherOrSuperuser(BasePermission):
         if request.method in SAFE_METHODS:
             return True
 
-        from core.views import AddQuizQuestion
+        from core.views import AddQuizQuestion, QuizUpdateView
         from core.views import RUDQuestion
 
-        if type(view) == AddQuizQuestion:
+        if type(view) in [AddQuizQuestion, QuizUpdateView]:
             quiz = get_object(Quiz, pk=view.kwargs.get('quiz_id'))
             class_id = quiz.class_room.id
 

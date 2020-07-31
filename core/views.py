@@ -61,6 +61,19 @@ class QuizCreateView(CreateAPIView):
         serializer.save(class_room=_class)
 
 
+class QuizUpdateView(RetrieveUpdateDestroyAPIView):
+    """
+    update quiz, only class teacher and supers users
+    """
+    permission_classes = [IsAuthenticated, IsTeacherOrSuperuser, ]
+    serializer_class = QuizSerializer
+
+    queryset = Quiz.objects.all().order_by('-id')
+
+    lookup_url_kwarg = 'quiz_id'
+    lookup_field = 'pk'
+
+
 class QuizAnswerDetailedView(RetrieveAPIView):
     """
     Detailed Quiz Answer views of  a specific session
@@ -157,7 +170,7 @@ class RegisterQuitClass(APIView):
     currently logged in user will be registered to the given class if method is post
     and will be removed from class if method is delete
     """
-    permission_classes = [IsAuthenticated,]
+    permission_classes = [IsAuthenticated, ]
 
     @staticmethod
     def post(request, *args, **kwargs):
