@@ -74,6 +74,18 @@ class QuizUpdateView(RetrieveUpdateDestroyAPIView):
     lookup_field = 'pk'
 
 
+class QuizTakersList(ListAPIView):
+    """
+    List of quiz takers of the given quiz
+    """
+    permission_classes = [IsAuthenticated, IsTeacherOrSuperuser]
+    serializer_class = QuizAnswerSerializer
+
+    def get_queryset(self):
+        the_quiz = get_object(Quiz, pk=self.kwargs.get('quiz_id'))
+        return the_quiz.answers.all()
+
+
 class QuizAnswerDetailedView(RetrieveAPIView):
     """
     Detailed Quiz Answer views of  a specific session

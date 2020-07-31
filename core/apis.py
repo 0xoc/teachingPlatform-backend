@@ -2,7 +2,7 @@ from django.conf.urls import url
 from django.urls import path
 from .views import UserProfileCreateView, ClassRoomCreateView, ClassRoomRetrieveView, QuizCreateView, RegisterQuitClass, \
     AddRemoveStudentClass, ClassRoomUpdateView, QuizQuestionsList, AddQuizQuestion, RUDQuestion, StartQuiz, \
-    CreateAnswer, QuizAnswerDetailedView, SetScoreView, ClassList, AuthenticateView, QuizUpdateView
+    CreateAnswer, QuizAnswerDetailedView, SetScoreView, ClassList, AuthenticateView, QuizUpdateView, QuizTakersList
 
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
@@ -30,20 +30,26 @@ urlpatterns = [
     path('class/list/', ClassList.as_view()),
     path('class/<int:class_id>/update/', ClassRoomUpdateView.as_view()),
 
+    # class enrollments
     path('class/<int:class_id>/register/', RegisterQuitClass.as_view()),
     path('class/<int:class_id>/register/<user_username>/', AddRemoveStudentClass.as_view()),
 
+    # quiz create/update
     path('class/<int:class_id>/quiz/create/', QuizCreateView.as_view()),
     path('quiz/<int:quiz_id>/update/', QuizUpdateView.as_view()),
 
+    # question create/update
     path('quiz/<int:quiz_id>/question/create/', AddQuizQuestion.as_view()),
     path('question/<int:question_id>/', RUDQuestion.as_view()),
 
+    # take exam APIs
     path('quiz/<int:quiz_id>/questions/', QuizQuestionsList.as_view()),
     path('quiz/<int:quiz_id>/start/', StartQuiz.as_view()),
     path('submit-answer/', CreateAnswer.as_view()),
     path('quiz-answer/<int:quiz_answer_id>/', QuizAnswerDetailedView.as_view()),
     path('answer/<int:answer_id>/set-score/', SetScoreView.as_view()),
+
+    path('quiz/<int:quiz_id>/takers/list/', QuizTakersList.as_view()),
 
     path('api-token-auth/', AuthenticateView.as_view()),
 
