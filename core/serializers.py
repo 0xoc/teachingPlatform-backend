@@ -78,7 +78,7 @@ class QuizSerializer(serializers.ModelSerializer):
     class Meta:
         model = Quiz
         fields = ['id', 'quiz_name', 'class_room', 'credit',
-                  'start_datetime', 'end_datetime', 'questions_count', 'is_active']
+                  'start_datetime', 'end_datetime', 'questions_count', 'is_active', 'is_published']
         extra_kwargs = {
             'class_room': {'read_only': True}
         }
@@ -87,6 +87,12 @@ class QuizSerializer(serializers.ModelSerializer):
         if attrs.get('end_datetime') < attrs.get('start_datetime'):
             raise serializers.ValidationError({'end_datetime': ['End date time must be after start date time']})
         return attrs
+
+
+class QuizPublishSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Quiz
+        fields = ['id', 'is_published']
 
 
 class ClassRoomSerializer(serializers.ModelSerializer):
@@ -152,6 +158,27 @@ class AnswerSerializer(serializers.ModelSerializer):
             return new
 
 
+class AnswerWithQuestionSerializer(serializers.ModelSerializer):
+    question = QuestionSerializer(read_only=True)
+
+    class Meta:
+        model = Answer
+        fields = ['id', 'question', 'quiz_answer', 'answer', 'score']
+        extra_kwargs = {
+            'score': {'read_only': True}
+        }
+
+
+class QuizAnswerDetailedSerializer(serializers.ModelSerializer):
+    answers = AnswerWithQuestionSerializer(many=True, read_only=True)
+    user_profile = UserProfileSerializer(read_only=True)
+    quiz = QuizSerializer(read_only=True)
+
+    class Meta:
+        model = QuizAnswer
+        fields = ['id', 'quiz', 'user_profile', 'score', 'answers']
+
+
 class ScoreAnswerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Answer
@@ -168,14 +195,6 @@ class ScoreAnswerSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(_("You don't have permission to set score"))
 
         return attrs
-
-
-class QuizAnswerDetailedSerializer(serializers.ModelSerializer):
-    answers = AnswerSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = QuizAnswer
-        fields = ['id', 'quiz', 'user_profile', 'score', 'answers']
 
 
 class QuizAnswerSerializer(serializers.ModelSerializer):
@@ -207,7 +226,7 @@ class QuizRetrieveSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Quiz
-        fields = ['id', 'questions', 'answers__quiz_answer']
+        fields = ['id', 'questions', 'answers__quiz_answer', 'is_published']
 
 
 class ClassRoomRetrieveSerializer(serializers.ModelSerializer):

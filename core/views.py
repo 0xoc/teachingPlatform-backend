@@ -9,7 +9,7 @@ from core.models import ClassRoom, UserProfile, Quiz, Question, QuizAnswer, Answ
 from core.permissions import IsTeacherOrSuperuser, CanSeeQuizQuestions, IsEnrolledInClass, IsQuizActive, IsSelfOrCanSee
 from core.serializers import UserProfileSerializer, ClassRoomSerializer, ClassRoomRetrieveSerializer, \
     QuizSerializer, QuestionSerializer, QuizAnswerSerializer, AnswerSerializer, QuizAnswerDetailedSerializer, \
-    ScoreAnswerSerializer, PrivateUserProfileSerializer, Authenticate
+    ScoreAnswerSerializer, PrivateUserProfileSerializer, Authenticate, QuizPublishSerializer
 from core.utils import get_object
 
 
@@ -67,6 +67,19 @@ class QuizUpdateView(RetrieveUpdateDestroyAPIView):
     """
     permission_classes = [IsAuthenticated, IsTeacherOrSuperuser, ]
     serializer_class = QuizSerializer
+
+    queryset = Quiz.objects.all().order_by('-id')
+
+    lookup_url_kwarg = 'quiz_id'
+    lookup_field = 'pk'
+
+
+class QuizPublishView(RetrieveUpdateDestroyAPIView):
+    """
+    update quiz, only class teacher and supers users
+    """
+    permission_classes = [IsAuthenticated, IsTeacherOrSuperuser, ]
+    serializer_class = QuizPublishSerializer
 
     queryset = Quiz.objects.all().order_by('-id')
 

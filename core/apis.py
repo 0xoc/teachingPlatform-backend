@@ -2,7 +2,8 @@ from django.conf.urls import url
 from django.urls import path
 from .views import UserProfileCreateView, ClassRoomCreateView, ClassRoomRetrieveView, QuizCreateView, RegisterQuitClass, \
     AddRemoveStudentClass, ClassRoomUpdateView, QuizQuestionsList, AddQuizQuestion, RUDQuestion, StartQuiz, \
-    CreateAnswer, QuizAnswerDetailedView, SetScoreView, ClassList, AuthenticateView, QuizUpdateView, QuizTakersList
+    CreateAnswer, QuizAnswerDetailedView, SetScoreView, ClassList, AuthenticateView, QuizUpdateView, QuizTakersList, \
+    QuizPublishView
 
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
@@ -37,6 +38,7 @@ urlpatterns = [
     # quiz create/update
     path('class/<int:class_id>/quiz/create/', QuizCreateView.as_view()),
     path('quiz/<int:quiz_id>/update/', QuizUpdateView.as_view()),
+    path('quiz/<int:quiz_id>/publish/', QuizPublishView.as_view()),
 
     # question create/update
     path('quiz/<int:quiz_id>/question/create/', AddQuizQuestion.as_view()),

@@ -28,6 +28,7 @@ class Quiz(models.Model):
     class_room = models.ForeignKey(ClassRoom, related_name="quizzes", on_delete=models.CASCADE)
     start_datetime = models.DateTimeField()
     end_datetime = models.DateTimeField()
+    is_published = models.BooleanField(default=False)
 
     @property
     def is_active(self):
