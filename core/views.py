@@ -231,7 +231,7 @@ class AddRemoveStudentClass(APIView):
         class_room = get_object(ClassRoom, pk=kwargs.get('class_id'))
 
         class_room.students.add(user_profile)
-        return Response({}, status=200)
+        return Response(UserProfileSerializer(instance=user_profile).data, status=200)
 
     @staticmethod
     def delete(request, *args, **kwargs):
